@@ -16,7 +16,22 @@ model Transaction {
   id        String      @id @default(uuid())
   amount    int
   status    TransactionStatus   @default(PENDING)    
-  
+  type      TransactionType
+  provider  PaymentProvider
+  providerRef String?           @unique
+  userId    String
+  user      User        @relation(fields: [userId], references: [id])
+  paymentMethodId String
+  paymentMethod PaymentMethod @relation(fields: [paymentMethodId], references: [id])
+  description String?
+  metaData Json?
+  idempotencyKey String?
+  errorMessage String?
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+  completedAt DateTime?
+  @@index([userId])
+  @@index([status])
 }
 
 enum TransactionStatus {
@@ -26,4 +41,18 @@ enum TransactionStatus {
   FAILED,
   REFUNDED,
   RESERVED
+}
+
+enum TransactionType {
+  CHARGE,
+  REFUND,
+  PAYOUT,
+  TRANSFER
+}
+
+enum PaymentProvider {
+  STRIPE,
+  PAYPAL,
+  ADYEN,
+  INTERNAL
 }
