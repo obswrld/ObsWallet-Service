@@ -1,6 +1,6 @@
 import bcrypt from "bcrypt";
 import { UserRepository } from "../repository/UserRepository";
-import { RegisterDto } from "../dto/auth.dto";
+import { RegisterDto, LoginDto } from "../dto/auth.dto";
 
 
 export class AuthService {
@@ -26,5 +26,21 @@ export class AuthService {
         const { password: _, ...safeUser } = user;
 
         return safeUser;  
+    }
+
+    async login(data: LoginDto) {
+        const user = await this.userRepository.findByEmail(data.email);
+        if(!user) {
+          throw new Error("User not found");
+        }
+
+        const isPasswordValid = await bcrypt.compare(data.password, user.password);
+        if(!isPasswordValid) {
+          throw new Error("Invalid password");
+        }
+
+        const { password: _, ...safeUser } = user;
+
+        return safeUser;
     }
 }
