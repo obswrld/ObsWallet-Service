@@ -18,6 +18,7 @@ export class AuthController {
       const user = await authService.register(result.data);
       return res.status(201).json(user);
     } catch (error) {
+      console.log(error)
       if(error instanceof Error) {
         return res.status(400).json({ message: error.message });
       }
@@ -36,6 +37,7 @@ export class AuthController {
       const user = await authService.login(result.data);
       return res.status(200).json(user);
     } catch (error) {
+      console.log(error)
       if(error instanceof Error) {
         return res.status(400).json({ message: error.message });
       }

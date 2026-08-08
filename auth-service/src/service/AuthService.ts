@@ -1,7 +1,7 @@
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 import { UserRepository } from "../repository/UserRepository";
 import { RegisterDto, LoginDto } from "../dto/auth.dto";
-
 
 export class AuthService {
     private userRepository: UserRepository;
@@ -39,8 +39,17 @@ export class AuthService {
           throw new Error("Invalid password");
         }
 
-        const { password: _, ...safeUser } = user;
+      const { password: _, ...safeUser } = user;
 
-        return safeUser;
+      const token = jwt.sign(
+        { id: safeUser.id, email: safeUser.email },
+        process.env.JWT_SECRET as string,
+        { expiresIn: "1h" }
+      )
+
+      return { ...safeUser, token };
+      
     }
+
+  
 }
