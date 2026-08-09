@@ -25,4 +25,11 @@ export class UserRepository {
       where: { id },
     })
   }
+
+  async markAsVerified(email: string): Promise<User> {
+    return prisma.user.update({
+      where: { email },
+      data: { isVerified: true },
+    })
+  }
 }

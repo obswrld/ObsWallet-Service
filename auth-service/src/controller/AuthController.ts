@@ -2,8 +2,10 @@ import { Request, Response } from 'express';
 import { AuthService } from '../service/AuthService';
 import { RegisterSchema, LoginSchema } from '../dto/auth.dto';
 import { UserRepository } from '../repository/UserRepository';
+import { EmailService } from '../service/EmailService';
 
-const authService = new AuthService(new UserRepository());
+
+const authService = new AuthService(new UserRepository(), new EmailService());
 
 export class AuthController {
 
@@ -38,6 +40,23 @@ export class AuthController {
       return res.status(200).json(user);
     } catch (error) {
       console.log(error)
+      if(error instanceof Error) {
+        return res.status(400).json({ message: error.message });
+      }
+      return res.status(500).json({ message: "Something went wrong" });
+    }
+  }
+
+  async verifyEmail(req: Request, res: Response) {
+    const token = req.query.token as string;
+    if(!token) {
+      return res.status(400).json({ message: "Token is required" });
+    }
+
+    try {
+      const user = await authService.verifyEmail(token);
+      return res.status(200).json({ message: "Email verified successfully", user });
+    } catch (error) {
       if(error instanceof Error) {
         return res.status(400).json({ message: error.message });
       }
